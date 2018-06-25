@@ -9,17 +9,19 @@ The goal of this challenge was twofold:
 
 The challenge is solved if we successfully send three pairs of input to a server:
 
+```
 (b1key, b1input)
 (b2key, b2input)
 (b3key, b3input)
+```
 
-Such that Comp(b1key, b1input) == Comp(b2key, b2input) and Comp(b3key, b3input) == 0.
+Such that `Comp(b1key, b1input) == Comp(b2key, b2input)` and `Comp(b3key, b3input) == 0`.
 
 ## DES modifications
 
 The `not_des.py` file contains something that is extremely similar to DES. Upon closer inspection, we see that it is exactly DES, but with the order of the S-boxes changed. 
 
-SBOXES = [S6, S4, S1, S5, S3, S2, S8, S7]
+`SBOXES = [S6, S4, S1, S5, S3, S2, S8, S7]`
 
 where the original DES would have the S-boxes in regular ascending order from 1 to 8.
 
@@ -42,7 +44,7 @@ For this part, we need to utilise the fact that in the Davies-Meyer construction
 which we want to be zero. Thus we want to find a fixed point of the encryption function E (which is DES),
 such that `E_k(m) = m`.
 
-Finding such points is hard in the general case, however, we note that DES has a small subset of keys that are called _weak keys_.  Indeed, it turns out that for such a weak key, the number of fixed points are large, namely 2<sup>32</sup>.
+Finding such points is hard in the general case, however, we note that DES has a small subset of keys that are called _weak keys_.  Indeed, it turns out that for such a weak key, the number of fixed points is large, namely 2<sup>32</sup>.
 For a proof, see e.g [1].
 
 An example of such a weak key is: `{0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01}`.
