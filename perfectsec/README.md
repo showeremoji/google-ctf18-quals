@@ -77,10 +77,10 @@ def f(c, k, N, inv):
 
 `m = f(c, key_size, N, inv(2)**e%N)`.
 
-Anfter about an hour of `1024` requests to the server and soem restarts,
+Anfter about an hour of `1024` requests to the server and some restarts, we founally got an `m`.
 
-## Extracting the flag 
-can be done by converting the int to ascii, easiest done going via hex:
+## Extracting the flag.. 
+..can be done by converting the int to ascii, easiest done going via hex:
 
 ```python
 def int2ascii(v):
@@ -92,3 +92,5 @@ def int2ascii(v):
 It turns out that the flag is padded with random bytes, but with those thrown away it's an Adele reference:
 
 `CTF{h3ll0__17_5_m3_1_w45_w0nd3r1n6_1f_4f73r_4ll_7h353_y34r5_y0u_d_l1k3_70_m337}`
+
+Rerunning the code is very fast by doing `python2 solve.py`, given that you have `pwntools` and the `cryptography` libraries installed. If you want to wait an hour for the server to respond instead you can remove the cache ;).
