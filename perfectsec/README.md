@@ -77,7 +77,7 @@ def f(c, k, N, inv):
 
 `m = f(c, key_size, N, inv(2)**e%N)`.
 
-Anfter about an hour of `1024` requests to the server and some restarts, we founally got an `m`.
+Anfter about an hour of `1024` requests to the server and some restarts, we finally found `m` as an int.
 
 ## Extracting the flag.. 
 ..can be done by converting the int to ascii, easiest done going via hex:
