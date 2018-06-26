@@ -38,61 +38,60 @@ def get_cache():
     return stored
 
 
-def enc(v):
-    hx = hex(v).replace('L', '')[2:]
-    hx = hx if not len(hx)%2 else '0' + hx
-    raw = hx.decode('hex')
-    return '\x00'*(KEY_BYTES - len(raw)) + raw
-
-
-# gets the last bit of v**d%N from cache or from server.
-def getb(v):
-    if v in stored:
-        return stored[v]
-    back = [0, 0]
-    r = remote('perfect-secrecy.ctfcompetition.com', '1337')
-    payload = '\x00\x01' + enc(v)
-    r.send(payload)
-    data = r.recvn(100)
-    r.close()
-    for c in data:
-        back[ord(c)] += 1
-    
-    ret = 0 if back[0] > back[1] else 1
-    stored[v] = ret
-    with open('cache', 'a') as f:
-        f.write('{} {}\n'.format(v, ret))
-    return ret
-
-
-# returns last k bits of the message m, where c = m**e.
-# inv is a number such that 2**e*inv%N == 1
-def fl(c, k, N, inv):
-    if k == 1:
-        b = getb(c) 
-        return b
-    a = fl((c*inv)%N, k-1, N, inv)
-    b = getb(c) 
-    if b == 0:
-        return 2*a
-    else:
-        lo = (1<<(k+1)) - 1
-        return (2*a - N&lo)%(lo+1)
-
-
 def int2ascii(v):
     hx = hex(v)[2:].replace('L', '')
     hx = '0' + hx if len(hx)%2 else hx
     return hx.decode('hex')
 
 
+def enc(v):
+    raw = int2ascii(v)
+    return '\x00'*(KEY_BYTES - len(raw)) + raw
+
+
+# gets the last bit of v**d%N from cache or from server.
+def lsb_cd(c):
+    if c in stored:
+        return stored[c]
+    back = [0, 0]
+    r = remote('perfect-secrecy.ctfcompetition.com', '1337')
+    payload = '\x00\x01' + enc(c) # enc - encodes c to ascii and pads with zerobytes.
+    r.send(payload)
+    data = r.recvn(100)
+    r.close()
+    for ch in data:
+        back[ord(ch)] += 1
+    
+    ret = 0 if back[0] > back[1] else 1
+    stored[c] = ret
+    with open('cache', 'a') as f:
+        f.write('{} {}\n'.format(c, ret))
+    return ret
+
+
+# returns last k bits of the message m, where c = m**e.
+# inv is a number such that 2**e*inv%N == 1
+def f(c, k, N, inv):
+    if k == 1:
+        b = lsb_cd(c) 
+        return b
+    a = f((c*inv)%N, k-1, N, inv)
+    b = lsb_cd(c) 
+    if b == 0:
+        return 2*a
+    else:
+        lo = 1<<(k+1)
+        return (2*a - N)%lo
+
+
+
 if __name__ == '__main__':
-    with open('flag.txt', 'rb') as f:
-        asciicipher = f.read()
+    with open('flag.txt', 'rb') as flg:
+        asciicipher = flg.read()
         cipher = int(asciicipher.encode('hex'), 16)
     N, KEY_BYTES, INV = get_rsadata()
     stored = get_cache()
-    flag = fl(cipher, 1024, N, INV)
+    flag = f(cipher, KEY_BYTES*8, N, INV)
     # print flag
     padded = int2ascii(flag)
     m = re.search('CTF\{.+\}', padded)
